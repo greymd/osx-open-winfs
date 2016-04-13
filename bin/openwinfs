@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+set -eu
+
+fs_prefix='\\\\'
+local_mountpoint_prefix='/mnt_openwinfs'
+win_path="$1"
+unix_path=
+
+# Default account (Guest)
+username=${2:-Guest}
+
+# Default password (empty)
+smbpwd=${3:-}
+
+# URL encoding
+urlenc () {
+	od -An -tx1 | awk 'NF{$1=$1;OFS="%";print "%"$0}' | tr '[:lower:]' '[:upper:]'
+}
+
+# If the string in the clipboard matches to '\\...'
+if [[ "$win_path" =~ ^($fs_prefix)  ]]; then
+
+	# Replace backslash(\) to slash(/)
+	unix_path=$(echo "$win_path" | sed 's@\\@/@g' | sed 's@^//@/@')
+
+	# Full path of the unix format like "/mnt_openwinfs/hostname/A/B/C..."
+	unix_path="$local_mountpoint_prefix""$unix_path"
+
+	# Devide each directory name into the array.
+	hierarchy=($(echo "$unix_path" | tr '/' '\n' | awk NF))
+
+	local_dir_name="${hierarchy[0]}"
+	host_name="${hierarchy[1]}"
+	volume_name="${hierarchy[2]}"
+
+	# Create mount point like "/mnt_openwinfs/smbfs/A" ... /mnt_openwinfs/{host name}/{volume name}
+	mount_point="/$local_dir_name/$host_name/$volume_name"
+
+	# URL encode of the volume name (2nd level subdirectory)
+	volume_name_urlenc=$(echo -n "$volume_name" | urlenc)
+
+	# URL encode of the samba password
+	smbpwd_urlenc=$(echo -n "$smbpwd" | urlenc)
+
+	# Check whether the volume is already mounted or not.
+	if [ $(/bin/df | grep "$mount_point" | /usr/bin/wc -l) = "0" ]; then
+
+		# If there is no empty directory being to be the mount point, create it.
+		if [ ! -e "$mount_point" ]; then
+			mkdir -p "$mount_point"
+		fi
+
+		# Newly mount the fs volume
+		mount_smbfs "//$username:$smbpwd_urlenc@$host_name/$volume_name_urlenc" "$mount_point"
+	fi
+
+	# Open the path with Finder
+	open "$unix_path"
+else
+	echo 'Path must start with "\\".' 1>&2
+	exit 1
+fi
+
+exit 0
