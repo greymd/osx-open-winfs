@@ -102,7 +102,7 @@ Finally, the new workflow is available.
    $ mount | /usr/bin/grep -oE '/mnt_openwinfs/[^ ]*' | xargs -I@ umount @
 
    ## And delete it.
-   $ rm -r /mnt/openwinfs
+   $ rm -r /mnt_openwinfs
 ```
 
 # License
