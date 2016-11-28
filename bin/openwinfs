@@ -14,7 +14,7 @@ smbpwd=${3:-}
 
 # URL encoding
 urlenc () {
-	od -An -tx1 | awk 'NF{$1=$1;OFS="%";print "%"$0}' | tr '[:lower:]' '[:upper:]'
+	od -An -tx1 | awk 'NF{OFS="%";$1=$1;print "%"$0}' | tr '[:lower:]' '[:upper:]'
 }
 
 # If the string in the clipboard matches to '\\...'
