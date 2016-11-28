@@ -98,7 +98,7 @@ Finally, the new workflow is available.
    $ sudo make uninstall
 
    # ""IF YOU MIND"", please delete /mnt_openwinfs directory.
-   ## Before deleting it, please make sure no volume is not mounted under /mnt_openwinfs directory.
+   ## Before deleting it, please make sure any volumes is not mounted under /mnt_openwinfs directory.
    $ mount | /usr/bin/grep -oE '/mnt_openwinfs/[^ ]*' | xargs -I@ umount @
 
    ## And delete it.
