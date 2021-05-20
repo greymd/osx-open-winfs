@@ -59,7 +59,7 @@
 				<key>ActionParameters</key>
 				<dict>
 					<key>COMMAND_STRING</key>
-					<string>cat | /usr/bin/iconv -f UTF-8-MAC -t UTF-8 | sed 's@^/mnt_openwinfs@@' | sed 's@/@\\@g' | sed 's@^\\@\\\\@' | tr -d '\n' | __CF_USER_TEXT_ENCODING=0x$(printf %x $(id -u)):0x08000100:14 /usr/bin/pbcopy</string>
+					<string>cat | /usr/bin/iconv -f UTF-8-MAC -t UTF-8 | sed 's@^/usr/local/mnt_openwinfs@@' | sed 's@/@\\@g' | sed 's@^\\@\\\\@' | tr -d '\n' | __CF_USER_TEXT_ENCODING=0x$(printf %x $(id -u)):0x08000100:14 /usr/bin/pbcopy</string>
 					<key>CheckedForUserDefaultShell</key>
 					<true/>
 					<key>inputMethod</key>

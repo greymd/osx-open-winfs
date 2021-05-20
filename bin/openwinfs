@@ -2,7 +2,7 @@
 set -eu
 
 fs_prefix='\\\\'
-local_mountpoint_prefix='/mnt_openwinfs'
+local_mountpoint_prefix='/usr/local/mnt_openwinfs'
 win_path="$1"
 unix_path=
 
@@ -23,7 +23,7 @@ if [[ "$win_path" =~ ^($fs_prefix)  ]]; then
 	# Replace backslash(\) to slash(/)
 	unix_path=$(echo "$win_path" | sed 's@\\@/@g' | sed 's@^//@/@')
 
-	# Full path of the unix format like "/mnt_openwinfs/hostname/A/B/C..."
+	# Full path of the unix format like "/usr/local/mnt_openwinfs/hostname/A/B/C..."
 	unix_path="$local_mountpoint_prefix""$unix_path"
 
 	# Devide each directory name into the array.
@@ -33,7 +33,7 @@ if [[ "$win_path" =~ ^($fs_prefix)  ]]; then
 	host_name="${hierarchy[1]}"
 	volume_name="${hierarchy[2]}"
 
-	# Create mount point like "/mnt_openwinfs/smbfs/A" ... /mnt_openwinfs/{host name}/{volume name}
+	# Create mount point like "/usr/local/mnt_openwinfs/smbfs/A" ... /usr/local/mnt_openwinfs/{host name}/{volume name}
 	mount_point="/$local_dir_name/$host_name/$volume_name"
 
 	# URL encode of the volume name (2nd level subdirectory)

@@ -18,7 +18,7 @@ Open a network file path with Windows style.
    $ git clone https://github.com/greymd/osx-open-winfs.git
    $ cd osx-open-winfs
    $ sudo make install
-   # /mnt_openwinfs directory will be created.
+   # /usr/local/mnt_openwinfs directory will be created.
 ```
 
 Please make sure following Services are enabled.
@@ -97,12 +97,12 @@ Finally, the new workflow is available.
 ```sh
    $ sudo make uninstall
 
-   # ""IF YOU MIND"", please delete /mnt_openwinfs directory.
-   ## Before deleting it, please make sure no volume is not mounted under /mnt_openwinfs directory.
-   $ mount | /usr/bin/grep -oE '/mnt_openwinfs/[^ ]*' | xargs -I@ umount @
+   # ""IF YOU MIND"", please delete /usr/local/mnt_openwinfs directory.
+   ## Before deleting it, please make sure no volume is not mounted under /usr/local/mnt_openwinfs directory.
+   $ mount | /usr/bin/grep -oE '/usr/local/mnt_openwinfs/[^ ]*' | xargs -I@ umount @
 
    ## And delete it.
-   $ rm -r /mnt_openwinfs
+   $ rm -r /usr/local/mnt_openwinfs
 ```
 
 # License

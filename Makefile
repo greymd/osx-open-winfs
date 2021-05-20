@@ -8,7 +8,7 @@ WORKFLOWOPEN2?= Open\ WinFsPath\ \(Guest\).workflow
 
 LOCALBASE?=     /usr/local
 BINDIR?=        ${LOCALBASE}/bin
-MNTDIR?=        /mnt_openwinfs
+MNTDIR?=        /usr/local/mnt_openwinfs
 INSTALL?=       /usr/bin/install
 MKDIR?=         /bin/mkdir -p
 RMDIR?=         /bin/rmdir
