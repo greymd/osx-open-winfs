@@ -1,64 +1,48 @@
 #!/usr/bin/env bash
 set -eu
-
-fs_prefix='\\\\'
-local_mountpoint_prefix='/usr/local/mnt_openwinfs'
-win_path="$1"
-unix_path=
-
-# Default account (Guest)
-username=${2:-Guest}
-
-# Default password (empty)
-smbpwd=${3:-}
+readonly LOCAL_MOUNTPOINT_PREFIX='/usr/local/mnt_openwinfs'
 
 # URL encoding
 urlenc () {
-	od -An -tx1 | awk 'NF{OFS="%";$1=$1;print "%"$0}' | tr '[:lower:]' '[:upper:]'
+  od -An -tx1 | awk 'NF{OFS="%";$1=$1;print "%"$0}' | tr '[:lower:]' '[:upper:]'
 }
 
-# If the string in the clipboard matches to '\\...'
-if [[ "$win_path" =~ ^($fs_prefix)  ]]; then
+main() {
+  local win_path="$1"
+  # Default account (Guest)
+  local username=${2:-Guest}
+  # Default password (empty)
+  local smbpwd=${3:-}
+  local unix_path=
+  # If the string in the clipboard matches to '\\...'
+  if [[ -n "${win_path##\\\\*}" ]]; then
+    echo 'Path must start with "\\".' 1>&2
+    exit 1
+  fi
+  # Replace backslash(\) to slash(/)
+  unix_path=$(printf '%s\n' "$win_path" | sed 's@\\@/@g' | sed 's@^//@/@')
+  # Devide each directory name into the array.
+  IFS="/" read -r -a hier <<< "$unix_path"
+  host_name="${hier[1]}"
+  volume_name="${hier[2]}"
+  # Create mount point like "/usr/local/mnt_openwinfs/smbfs/A" ... /usr/local/mnt_openwinfs/{host name}/{volume name}
+  mount_point="${LOCAL_MOUNTPOINT_PREFIX}/${host_name}/${volume_name}"
+  # URL encode of the volume name (2nd level subdirectory)
+  volume_name_urlenc=$(printf '%s' "$volume_name" | urlenc)
+  # URL encode of the samba password
+  smbpwd_urlenc=$(printf '%s' "$smbpwd" | urlenc)
+  # Check whether the volume is already mounted or not.
+  if [ "$(/bin/df | grep -c "$mount_point")" = "0" ]; then
+    # If there is no empty directory being to be the mount point, create it.
+    if [ ! -e "$mount_point" ]; then
+      mkdir -p "$mount_point"
+    fi
+    # Newly mount the fs volume
+    mount_smbfs "//$username:$smbpwd_urlenc@$host_name/$volume_name_urlenc" "$mount_point"
+  fi
+  # Open the path with Finder
+  open "${LOCAL_MOUNTPOINT_PREFIX}${unix_path}"
+  exit 0
+}
 
-	# Replace backslash(\) to slash(/)
-	unix_path=$(echo "$win_path" | sed 's@\\@/@g' | sed 's@^//@/@')
-
-	# Full path of the unix format like "/usr/local/mnt_openwinfs/hostname/A/B/C..."
-	unix_path="$local_mountpoint_prefix""$unix_path"
-
-	# Devide each directory name into the array.
-	hierarchy=($(echo "$unix_path" | tr '/' '\n' | awk NF))
-
-	local_dir_name="${hierarchy[0]}"
-	host_name="${hierarchy[1]}"
-	volume_name="${hierarchy[2]}"
-
-	# Create mount point like "/usr/local/mnt_openwinfs/smbfs/A" ... /usr/local/mnt_openwinfs/{host name}/{volume name}
-	mount_point="/$local_dir_name/$host_name/$volume_name"
-
-	# URL encode of the volume name (2nd level subdirectory)
-	volume_name_urlenc=$(echo -n "$volume_name" | urlenc)
-
-	# URL encode of the samba password
-	smbpwd_urlenc=$(echo -n "$smbpwd" | urlenc)
-
-	# Check whether the volume is already mounted or not.
-	if [ $(/bin/df | grep "$mount_point" | /usr/bin/wc -l) = "0" ]; then
-
-		# If there is no empty directory being to be the mount point, create it.
-		if [ ! -e "$mount_point" ]; then
-			mkdir -p "$mount_point"
-		fi
-
-		# Newly mount the fs volume
-		mount_smbfs "//$username:$smbpwd_urlenc@$host_name/$volume_name_urlenc" "$mount_point"
-	fi
-
-	# Open the path with Finder
-	open "$unix_path"
-else
-	echo 'Path must start with "\\".' 1>&2
-	exit 1
-fi
-
-exit 0
+main ${1+"$@"}
