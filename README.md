@@ -15,7 +15,7 @@ Open a network file path with Windows style.
 * Execute following commands (**sudo privilege is necessary**).
 
 ```sh
-   $ git clone https://github.com/greymd/osx-open-winfs.git
+   $ git clone https://github.com/greymd/osx-open-winfs.git -b v2.0
    $ cd osx-open-winfs
    $ sudo make install
    # /usr/local/mnt_openwinfs directory will be created.
