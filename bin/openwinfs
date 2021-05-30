@@ -4,7 +4,7 @@ readonly LOCAL_MOUNTPOINT_PREFIX='/usr/local/mnt_openwinfs'
 
 # URL encoding
 urlenc () {
-  od -An -tx1 | awk 'NF{OFS="%";$1=$1;print "%"$0}' | tr '[:lower:]' '[:upper:]'
+  od -v -An -tx1 | awk 'NF{OFS="%";$1=$1;print "%"$0}' | tr '[:lower:]' '[:upper:]'
 }
 
 main() {
